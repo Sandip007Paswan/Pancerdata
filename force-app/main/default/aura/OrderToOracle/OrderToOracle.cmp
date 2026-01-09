@@ -1,0 +1,84 @@
+<aura:component controller="OrderToOracleController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global" >
+    
+    <aura:attribute name="ErrorMessage" type="String"/>
+    <aura:attribute name="Status" type="String"/>
+    <aura:attribute name="StatusCode" type="String"/>
+    <aura:attribute name="RequestId" type="String"/>
+    <aura:attribute name="accCreated" type="Boolean" default="false"/>
+    <aura:attribute name="oppCreated" type="Boolean" default="false"/>
+    <aura:attribute name="SentSuccess" type="Boolean" default="false"/>
+    <aura:attribute name="isValidated" type="Boolean" default="false"/>
+    <aura:attribute name="oppSent" type="Boolean" default="false"/>
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <!--<aura:handler name="init" value="{!this}" action="{!c.doInit}" />-->
+     
+    <force:recordData aura:id="recordEditor"
+                      fields="AccountId, Account.Customer_Account_Type__c, Account.ParentId, Account.Parent.ERP_Id__c, Status, Order_Type__c, Order_Type__r.Order_Type_ID__c,Payment_Terms__c,Bill_To_Address__c,Bill_To_Address__r.ERP_Id__c,
+                              Address__c, Address__r.ERP_Id__c, Warehouse__c,Warehouse__r.Code__c ,Account.ERP_Id__c, Warranty_Start_Date__c, Sales_Rep__c, Oracle_Submission_Status__c"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetFields ="{!v.simpleRecord}"
+                      recordUpdated="{!c.doInit}"
+                      mode="VIEW" />
+    
+    <!--Estimated_Delivery_Date__c,Delivery_Date_Formula__c-->
+    
+    <!-- PAGE HEADER-->
+    <lightning:layout horizontalAlign="space">
+        <lightning:layoutItem padding="around-small">
+            <div class="custom-box" style ="color:black; text-align: center; padding-bottom: 20px;">
+                <h1 class="slds-text-heading--medium"><b>Submit Order to Oracle</b></h1>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <!-- / PAGE HEADER -->
+    {!v.recordError}
+    <!-- BODY -->
+    <div class="c-container">
+            <div class="slds-grid slds-gutters">
+                <aura:if isTrue="{!v.oppSent}">
+                    <aura:if isTrue="{!v.SentSuccess}"> 
+                        <div class="slds-size_2-of-3 slds-text-align_center" style="width:85%; line-height:40px; padding-bottom: 30px;">
+                            <span style="vertical-align:middle;font-weight: 500;font-size: initial;">Information has been sent to Oracle successfully <br/>Kindly check on Request ID.</span>
+                        </div>
+                        <div class="slds-size_-of-3 slds-text-align_left slds-m-top_medium" style="width:15%;">
+                            <lightning:icon iconName="action:approval" size="x-middle"/>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-size_2-of-3 slds-text-align_center" style="width:85%; line-height:40px; padding-bottom: 30px;">
+                                <span style="vertical-align:middle;font-weight: 500;font-size: initial;">Information has been sent to Oracle unsuccessfully. <br/>Please contact your Administrator.</span>
+                            </div>
+                            <div class="slds-size_1-of-3 slds-text-align_center slds-m-top_medium" style="width:10%;">
+                                <lightning:icon iconName="action:close" size="x-middle"/>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+        </div>
+    </div>
+    <!-- / BODY -->
+    
+   <aura:if isTrue="{!v.oppSent}">
+        {!v.Status} - {!v.StatusCode} 
+        <aura:if isTrue="{!v.SentSuccess}">
+            <div class="">Request Id : {!v.RequestId}</div>
+            <aura:set attribute="else">
+                <div class="slds-text-heading_small slds-text-color_error">{!v.ErrorMessage}</div>
+            </aura:set>
+        </aura:if>
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.spinner}">
+        <div class="demo-only" style="height: 6rem;">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>  
+</aura:component>

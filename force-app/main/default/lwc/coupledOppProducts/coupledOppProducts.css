@@ -1,0 +1,9 @@
+.slds-is-open .lineItemTable {
+    display: block;
+}
+.lineItemTable {
+    display: none;
+}
+.slds-timeline__item_expandable:before {
+    content: none;
+}

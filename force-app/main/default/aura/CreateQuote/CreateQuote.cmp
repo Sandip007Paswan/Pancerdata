@@ -1,0 +1,199 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId,lightning:actionOverride" controller="CreateQuoteController">
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <!--<aura:attribute name="pdfURL" type="String"/>-->
+
+    <aura:attribute name="opp" type="Object"/>
+    <aura:attribute name="quoteId" type="String" default="null"/>
+    <aura:attribute name="contactId" type="String"/>
+    <aura:attribute name="expirationDate" type="Date"/>
+    <aura:attribute name="priceOther" type="Boolean" default="false" />
+    <aura:attribute name="deliveryOther" type="Boolean" default="false"/>
+    <aura:attribute name="paymentOther" type="Boolean" default="false"/>
+    <aura:attribute name="warrantyOther" type="Boolean" default="false"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="selectedContact" type="List"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+    
+    <force:recordData aura:id="recordEditor"
+                      fields="AccountId,Price_Validity__c, Price_Validity_Other__c,Delivery__c, Delivery_Other__c, Sold_To_Contact_ID__c,
+                              Payment_Method__c, Payment_Method_Other__c, Warranty_Period__c, Warranty_Period_Other__c"      
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetFields ="{!v.simpleRecord}"
+                      recordUpdated="{!c.doInit}"
+                      mode="VIEW" />
+    
+    <lightning:recordEditForm objectApiName="Quote" onsubmit="{!c.createQuoteAction}">
+        <lightning:layout>
+            <lightning:layoutItem size="5">     
+                <!--<lightning:inputField fieldName="ContactId" onchange="{!c.inputChanged}" />-->
+                <aura:if isTrue="{!v.simpleRecord.Sold_To_Contact_ID__c != null}">
+                    Contact
+                    <div class="slds-col lookup1">                
+                        <c:lookup 
+                                  aura:id="lookupChild"
+                                  onsearch="{!c.inputChanged}"
+                                  onselectionchange="{!c.handleSelectionChange}"
+                                  placeholder="Search Contact.."
+                                  scroll-after-n-items="10"
+                                  selection = "{!v.selectedContact}">
+                        </c:lookup>
+                    </div>
+                    <aura:set attribute="else">
+                        <lightning:inputField fieldName="Contact_Name__c"/> 
+                        <lightning:inputField fieldName="Phone"/> 
+                        <lightning:inputField fieldName="Fax"/> 
+                    </aura:set>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+        
+        <lightning:layout>
+            <lightning:layoutItem size="5">        
+                <lightning:inputField fieldName="Customer_Ref_No__c"/>        
+            </lightning:layoutItem>      
+        </lightning:layout> 
+        
+    <!--<lightning:layout>
+      <lightning:layoutItem>
+        
+          <lightning:inputField fieldName="ExpirationDate" required="true"/>
+        
+      </lightning:layoutItem>      
+    </lightning:layout>-->
+
+        <div style="max-width: 400px;">
+            <lightning:layout>
+                <lightning:layoutItem size="12">        
+                    <lightning:inputField fieldName="BillingStreet" value="{!v.opp.Bill_To_Address__r.Street__c}"/>        
+                </lightning:layoutItem>      
+            </lightning:layout>    
+            
+            <lightning:layout>
+                <lightning:layoutItem size="12">        
+                    <lightning:inputField fieldName="BillingPostalCode" value="{!v.opp.Bill_To_Address__r.Postal_Code__c}"/>        
+                </lightning:layoutItem>      
+            </lightning:layout>    
+            
+            <lightning:layout>
+                <lightning:layoutItem size="7">        
+                    <lightning:inputField fieldName="BillingCity" value="{!v.opp.Bill_To_Address__r.City__c}"/>        
+                </lightning:layoutItem>     
+                <lightning:layoutItem size="5">        
+                    <lightning:inputField fieldName="BillingState" value="{!v.opp.Bill_To_Address__r.State__c}"/>        
+                </lightning:layoutItem>         
+            </lightning:layout>    
+            
+            <lightning:layout>
+                <lightning:layoutItem size="12">        
+                    <lightning:inputField fieldName="BillingCountry" value="{!v.opp.Bill_To_Address__r.Country__c}"/>        
+                </lightning:layoutItem>      
+            </lightning:layout>     
+        </div>
+        
+        <div style="max-width: 400px;">
+            <!--<lightning:layout>
+      <lightning:layoutItem size="12">        
+          <lightning:inputField fieldName="ShippingStreet" value="{!v.opp.AddressX1__r.Street__c}"/>        
+      </lightning:layoutItem>      
+    </lightning:layout>    
+
+    <lightning:layout>
+      <lightning:layoutItem size="12">        
+          <lightning:inputField fieldName="ShippingPostalCode" value="{!v.opp.AddressX1__r.Postal_Code__c}"/>        
+      </lightning:layoutItem>      
+    </lightning:layout>    
+
+    <lightning:layout>
+      <lightning:layoutItem size="7">        
+          <lightning:inputField fieldName="ShippingCity" value="{!v.opp.AddressX1__r.City__c}"/>        
+      </lightning:layoutItem>     
+      <lightning:layoutItem size="5">        
+          <lightning:inputField fieldName="ShippingState" value="{!v.opp.AddressX1__r.State__c}"/>        
+      </lightning:layoutItem>         
+    </lightning:layout>    
+
+    <lightning:layout>
+      <lightning:layoutItem size="12">        
+          <lightning:inputField fieldName="ShippingCountry" value="{!v.opp.AddressX1__r.Country__c}"/>        
+      </lightning:layoutItem>      
+    </lightning:layout>-->
+            
+            <!--<lightning:layout>
+          <lightning:layoutItem size="12">        
+              <lightning:inputField fieldName="Delivery__c"/>        
+          </lightning:layoutItem>      
+      </lightning:layout>-->
+            
+            <!--<lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="PriceValidity" fieldName="Price_Validity__c" onchange="{!c.inputChanged}" value=''/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="PriceValidityOther" fieldName="Price_Validity_Other__c" disabled = "true" messageWhenBadInput="Date must be newer than..."/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="Delivery" fieldName="Delivery2__c" onchange="{!c.inputChanged}" value=''/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="DeliveryOther" fieldName="Delivery_Other__c" disabled = "true"/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="PaymentMethod" fieldName="Payment_Method__c" onchange="{!c.inputChanged}" value=''/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="PaymentMethodOther" fieldName="Payment_Method_Other__c" disabled = "true"/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="WarrantyPeriod" fieldName="Warranty_Period__c" onchange="{!c.inputChanged}" value=''/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+            <lightning:layout>
+                <lightning:layoutItem>        
+                    <lightning:inputField aura:id="WarrantyPeriodOther" fieldName="Warranty_Period_Other__c" disabled = "true"/>        
+                </lightning:layoutItem>      
+            </lightning:layout> -->
+            
+            <lightning:layout>
+                <lightning:layoutItem size="12">        
+                    <lightning:inputField fieldName="Description"/>        
+                </lightning:layoutItem>      
+            </lightning:layout> 
+            
+        </div>  
+        
+        <lightning:layout >
+            <lightning:layoutItem size="12" class="slds-align_absolute-center">  
+                <lightning:button type="submit" variant="brand">Create Quote</lightning:button>
+            </lightning:layoutItem>      
+        </lightning:layout>  
+        
+    </lightning:recordEditForm>
+    <!--
+    <iframe aura:id="pdfFrame" src="{!v.pdfURL}"></iframe>
+ -->
+</aura:component>

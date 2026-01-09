@@ -1,0 +1,503 @@
+<template>
+    <div class="container">
+        <div style="min-width:1200px">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="" scope="col" style="width:20%">
+                            <div class="slds-truncate" title="Product">Product</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Code">Code</div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Qty Remain">Qty Remain</div>
+                        </th>
+
+                        <th class="" scope="col" style="width:6%">
+                            <div class="slds-truncate" title="UoM">UoM</div>
+                        </th>
+
+                        <template if:false={isCES}>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title={supplierCurrency}>{supplierCurrency}</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Selling Factor">Selling Factor</div>
+                            </th>
+                        </template>
+                        <template if:true={isCES}>
+                            <template if:false={isSalesPerson}>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Cost Price">Cost Price</div>
+                                </th>
+                            </template>
+
+                            <template if:true={isSalesPerson}>
+                                <template if:true={isINDENTSALES}>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Cost Price">Cost Price</div>
+                                    </th>
+                                </template>
+                            </template>
+
+                        </template>
+                        <template if:true={isCES}>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="List Price">List Price</div>
+                            </th>
+                        </template>
+
+                        <template if:true={isCES}>
+                            <template if:false={isSalesPerson}>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Margin %">Margin %</div>
+                                </th>
+                            </template>
+
+                            <template if:true={isSalesPerson}>
+                                <template if:true={isINDENTSALES}>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Margin %">Margin %</div>
+                                    </th>
+                                </template>
+                            </template>
+
+                        </template>
+                        <template if:true={isCES}>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Discount">Discount</div>
+                            </th>
+                        </template>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Sales Price">Sales Price</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Quantity">Quantity</div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Total Price">Total Sales Price</div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <template for:each={lineItems} for:item="item">
+                        <tr key={item.Id}>
+                            <template if:false={item.isNew}>
+                                <th data-label="Product Name" scope="row">
+                                    <lightning-layout>
+                                        <lightning-layout-item style="width: 35px;">
+                                            <lightning-icon icon-name="action:close" size="xx-small"
+                                                alternative-text="Remove" title="Remove" style="cursor:pointer"
+                                                onclick={openDeleteProductModal} data-index={item.index}
+                                                data-id={item.Id}></lightning-icon>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item style="line-height: 32px;" class="slds-truncate">
+                                            <a class="slds-cell-wrap" href={item.productUrl} tabindex="-1"
+                                                target="_blank">{item.Product2.Name}</a>
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </th>
+                            </template>
+                            <template if:true={item.isNew}>
+                                <th data-label="Product Name" scope="row">
+                                    <lightning-layout>
+                                        <template if:true={item.isRemoveable}>
+                                            <lightning-layout-item>
+                                                <lightning-icon icon-name="action:close" size="xx-small"
+                                                    alternative-text="Remove" title="Remove" style="cursor:pointer"
+                                                    onclick={removeProduct} data-index={item.index}></lightning-icon>
+                                            </lightning-layout-item>
+                                        </template>
+                                        <div class="slds-col lookup1">
+                                            <c-lookup data-index={item.index} data-config={item.config}
+                                                errors={item.errors} onsearch={handleSearch}
+                                                onselectionchange={handleSelectionChange}
+                                                placeholder={item.placeholderLabel} scroll-after-n-items="10">
+                                            </c-lookup>
+                                        </div>
+                                    </lightning-layout>
+                                </th>
+                            </template>
+                            <td data-label="Product Code">
+                                <div class="slds-truncate" title={item.Product2.ProductCode}>{item.Product2.ProductCode}
+                                </div>
+                            </td>
+
+                            <td data-label="Qty Remain" class="slds-text-align_center">
+                                <div class="slds-truncate" title={item.Quantity_Remaining__c}>
+                                    {item.Quantity_Remaining__c}</div>
+                            </td>
+
+                            <td data-label="Product UOM">
+                                <lightning-combobox name="UOM" variant="label-hidden" data-index={item.index}
+                                    value={item.selectedOption} options={item.Options} onchange={UOMChangeHandler}
+                                    required>
+                                </lightning-combobox>
+
+                            </td>
+
+                            <template if:false={isCES}>
+                                <td data-label={supplierCurrency} class="slds-text-align_center">
+                                    <lightning-input type="number" name="Amount_In_Supplier_Currency__c"
+                                        value={item.Amount_In_Supplier_Currency__c} variant="label-hidden"
+                                        data-index={item.index} onchange={inputChanged} required></lightning-input>
+                                </td>
+                                <td data-label="Selling Factor" class="slds-text-align_center">
+                                    <lightning-input type="number" name="Selling_Factor__c"
+                                        value={item.Selling_Factor__c} step="0.0001" variant="label-hidden"
+                                        data-index={item.index} onchange={inputChanged} required disabled>
+                                    </lightning-input>
+                                </td>
+                            </template>
+
+                            <template if:true={isCES}>
+                                <template if:false={isSalesPerson}>
+                                    <td data-label="Cost Price" class="slds-text-align_center">
+                                        <lightning-input type="number" name="Cost_Price__c" value={item.Cost_Price__c}
+                                            min=0 step="0.01" variant="label-hidden" data-index={item.index}
+                                            onchange={inputChanged}></lightning-input>
+                                    </td>
+                                </template>
+
+                                <template if:true={isSalesPerson}>
+                                    <template if:true={isINDENTSALES}>
+                                        <td data-label="Cost Price" class="slds-text-align_center">
+                                            <lightning-input type="number" name="Cost_Price__c"
+                                                value={item.Cost_Price__c} min=0 step="0.01" variant="label-hidden"
+                                                data-index={item.index} onchange={inputChanged}></lightning-input>
+                                        </td>
+                                    </template>
+                                </template>
+
+                                <td data-label="List Price" class="slds-text-align_center">
+                                    <lightning-input type="number" name="ListPrice" value={item.ListPrice} step="0.01"
+                                        variant="label-hidden" data-index={item.index} onchange={inputChanged} required
+                                        disabled></lightning-input>
+                                </td>
+
+                            </template>
+
+                            <template if:true={isCES}>
+                                <template if:false={isSalesPerson}>
+                                    <td data-label="Margin %" class="slds-text-align_center">
+                                        <lightning-input type="number" name="Margin__c" value={item.Margin__c}
+                                            step="0.01" min=0 formatter="percent-fixed" variant="label-hidden"
+                                            data-index={item.index} onchange={inputChanged} required disabled>
+                                        </lightning-input>
+                                    </td>
+                                </template>
+
+                                <template if:true={isSalesPerson}>
+                                    <template if:true={isINDENTSALES}>
+                                        <td data-label="Margin %" class="slds-text-align_center">
+                                            <lightning-input type="number" name="Margin__c" value={item.Margin__c}
+                                                step="0.01" min=0 formatter="percent-fixed" variant="label-hidden"
+                                                data-index={item.index} onchange={inputChanged} required disabled>
+                                            </lightning-input>
+                                        </td>
+                                    </template>
+                                </template>
+
+                                <td data-label="Discount" class="slds-text-align_center">
+                                    <lightning-input type="number" name="Discount" value={item.Discount} step="0.01"
+                                        min="0" max="100" formatter="percent-fixed" variant="label-hidden"
+                                        data-index={item.index} onchange={inputChanged} required></lightning-input>
+                                </td>
+                            </template>
+
+                            <td data-label="Sales Price" class="slds-text-align_center">
+                                <lightning-input type="number" name="UnitPrice" value={item.UnitPrice} min=0 step="0.01"
+                                    variant="label-hidden" data-index={item.index} onchange={inputChanged} required>
+                                </lightning-input>
+                            </td>
+
+                            <td data-label="Quantity" class="slds-text-align_center">
+                                <lightning-input type="number" name="Quantity" value={item.Quantity} min=0 step="0.0001"
+                                    variant="label-hidden" data-index={item.index} onchange={inputChanged} required>
+                                </lightning-input>
+                            </td>
+
+
+
+                            <td data-label="Total Price" class="">
+                                <div class="slds-truncate" title={item.TotalPrice}>
+                                    <lightning-formatted-number value={item.TotalPrice} format-style="currency"
+                                        currency-code="MYR" currency-display-as="symbol" minimum-fraction-digits="2"
+                                        maximum-fraction-digits="2"></lightning-formatted-number>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </template>
+                    <tr>
+                        <template if:false={isCES}>
+                            <td colspan="12">
+                                <div class="slds-text-align_left">
+                                    <lightning-button variant="brand" label="Add Product" title="Add Product"
+                                        onclick={addProduct}></lightning-button>
+                                </div>
+                            </td>
+                        </template>
+                        <template if:true={isCES}>
+                            <td colspan="12">
+                                <div class="slds-text-align_left">
+                                    <lightning-button variant="brand" label="Add Product" title="Add Product"
+                                        onclick={addProduct}></lightning-button>
+                                </div>
+                            </td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!--///////////////////-New Product-////////////////////-->
+
+        <div style="min-width:1200px;margin-top: 30px;">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="" scope="col" style="width:20%">
+                            <div class="slds-truncate" title="New Product">New Product</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Code">Code</div>
+                        </th>
+
+                        <th class="" scope="col" style="width:6%">
+                            <div class="slds-truncate" title="UoM">UoM</div>
+                        </th>
+
+                        <template if:true={isCES}>
+                            <template if:false={isSalesPerson}>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Cost Price">Cost Price</div>
+                                </th>
+                            </template>
+
+                            <template if:true={isSalesPerson}>
+                                <template if:true={isINDENTSALES}>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Cost Price">Cost Price</div>
+                                    </th>
+                                </template>
+                            </template>
+
+                        </template>
+                        <template if:true={isCES}>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="List Price">List Price</div>
+                            </th>
+                        </template>
+
+                        <template if:true={isCES}>
+                            <template if:false={isSalesPerson}>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Margin %">Margin %</div>
+                                </th>
+                            </template>
+
+                            <template if:true={isSalesPerson}>
+                                <template if:true={isINDENTSALES}>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Margin %">Margin %</div>
+                                    </th>
+                                </template>
+                            </template>
+
+                        </template>
+                        <template if:true={isCES}>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Discount">Discount</div>
+                            </th>
+                        </template>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Sales Price">Sales Price</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Quantity">Quantity</div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Total Price">Total Sales Price</div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template for:each={newlineItems} for:item="item">
+                        <tr key={item.Id}>
+                            <th data-label="Product Name" scope="row">
+                                <lightning-layout>
+                                    <lightning-layout-item style="width: 35px;">
+                                        <lightning-icon icon-name="action:close" size="xx-small"
+                                            alternative-text="Remove" title="Remove" style="cursor:pointer"
+                                            onclick={removeNewProduct} data-index={item.index}></lightning-icon>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item style="line-height: 32px;"
+                                        class="slds-truncate slds-m-left_x-small">
+                                        <lightning-input type="text" variant="label-hidden" name="Name"
+                                            data-index={item.index} value={item.Product2.Name}
+                                            onchange={newInputChanged} required>
+                                        </lightning-input>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </th>
+
+                            <td data-label="Product Code" class="slds-text-align_center">
+                                <lightning-input type="text" variant="label-hidden" data-index={item.index}
+                                    name="ProductCode" value={item.Product2.ProductCode} onchange={newInputChanged}
+                                    required>
+                                </lightning-input>
+
+                            </td>
+
+                            <td data-label="Product UOM">
+                                <lightning-combobox name="UOM__c" variant="label-hidden" data-index={item.index}
+                                    value={item.selectedOption} options={UOMPicklistValues.data.values}
+                                    onchange={newInputChanged} required>
+                                </lightning-combobox>
+
+                            </td>
+
+                            <template if:true={isCES}>
+                                <template if:false={isSalesPerson}>
+                                    <td data-label="Cost Price" class="slds-text-align_center">
+                                        <lightning-input type="number" name="Cost_Price__c" value={item.Cost_Price__c}
+                                            min=0 step="0.01" variant="label-hidden" data-index={item.index}
+                                            onchange={newInputChanged}></lightning-input>
+                                    </td>
+                                </template>
+
+                                <template if:true={isSalesPerson}>
+                                    <template if:true={isINDENTSALES}>
+                                        <td data-label="Cost Price" class="slds-text-align_center">
+                                            <lightning-input type="number" name="Cost_Price__c"
+                                                value={item.Cost_Price__c} min=0 step="0.01" variant="label-hidden"
+                                                data-index={item.index} onchange={newInputChanged}></lightning-input>
+                                        </td>
+                                    </template>
+                                </template>
+
+                                <td data-label="List Price" class="slds-text-align_center">
+                                    <lightning-input type="number" name="ListPrice" value={item.ListPrice} step="0.01"
+                                        variant="label-hidden" data-index={item.index} onchange={newInputChanged}
+                                        required></lightning-input>
+                                </td>
+
+                            </template>
+
+                            <template if:true={isCES}>
+                                <template if:false={isSalesPerson}>
+                                    <td data-label="Margin %" class="slds-text-align_center">
+                                        <lightning-input type="number" name="Margin__c" value={item.Margin__c}
+                                            step="0.01" formatter="percent-fixed" variant="label-hidden"
+                                            data-index={item.index} onchange={newInputChanged} required disabled>
+                                        </lightning-input>
+                                    </td>
+                                </template>
+
+                                <template if:true={isSalesPerson}>
+                                    <template if:true={isINDENTSALES}>
+                                        <td data-label="Margin %" class="slds-text-align_center">
+                                            <lightning-input type="number" name="Margin__c" value={item.Margin__c}
+                                                step="0.01" formatter="percent-fixed" variant="label-hidden"
+                                                data-index={item.index} onchange={newInputChanged} required disabled>
+                                            </lightning-input>
+                                        </td>
+                                    </template>
+                                </template>
+
+                                <td data-label="Discount" class="slds-text-align_center">
+                                    <lightning-input type="number" name="Discount" value={item.Discount} step="0.01"
+                                        min="0" max="100" formatter="percent-fixed" variant="label-hidden"
+                                        data-index={item.index} onchange={newInputChanged} required></lightning-input>
+                                </td>
+                            </template>
+
+                            <td data-label="Sales Price" class="slds-text-align_center">
+                                <lightning-input type="number" name="UnitPrice" value={item.UnitPrice} min=0 step="0.01"
+                                    variant="label-hidden" data-index={item.index} onchange={newInputChanged} required>
+                                </lightning-input>
+                            </td>
+
+                            <td data-label="Quantity" class="slds-text-align_center">
+                                <lightning-input type="number" name="Quantity" value={item.Quantity} min=0 step="0.0001"
+                                    variant="label-hidden" data-index={item.index} onchange={newInputChanged} required>
+                                </lightning-input>
+                            </td>
+
+                            <td data-label="Total Price" class="">
+                                <div class="slds-truncate" title={item.TotalPrice}>
+                                    <lightning-formatted-number value={item.TotalPrice} format-style="currency"
+                                        currency-code="MYR" currency-display-as="symbol" minimum-fraction-digits="2"
+                                        maximum-fraction-digits="2"></lightning-formatted-number>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </template>
+                    <tr>
+                        <td colspan="12">
+                            <div class="slds-text-align_left">
+                                <lightning-button variant="brand" label="Add New Product" title="Add New Product"
+                                    onclick={addNewProduct}></lightning-button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <!--///////////////////-New Product-////////////////////-->
+
+        <div class="slds-text-align_center slds-var-m-top_small">
+            <lightning-button variant="brand" label="Save Product(s)" data-close="false" title="Save Product(s)"
+                onclick={saveProducts}></lightning-button> &nbsp;
+            <lightning-button variant="brand" label="Save Product(s) and Close" data-close="true"
+                title="Save Product(s) and Close" onclick={saveProducts}></lightning-button>
+        </div>
+
+        <template if:true={showSpinner}>
+            <lightning-spinner variant="brand" size="large">
+            </lightning-spinner>
+        </template>
+
+    </div>
+
+    <template if:true={showDeleteProductModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container" style="width:20rem;min-width:20rem;">
+                <header class="slds-modal__header">
+                    <lightning-button-icon class="slds-modal__close" title="Close" icon-name="utility:close"
+                        icon-class="slds-button_icon-inverse" onclick={closeDeleteProductModal}></lightning-button-icon>
+                    <h2 class="slds-text-heading_medium slds-hyphenate header-string">
+                        Confirm Delete
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium slds-text-align_center" id="modal-content-id-1">
+                    <p>Are you sure?</p>
+                </div>
+
+                <footer class="slds-modal__footer modal-hidden">
+                    <lightning-button onclick={deleteProduct} data-id={productToDeleteId}
+                        data-index={productToDeleteIndex} variant="destructive" label="Delete"></lightning-button>&nbsp;
+                    <lightning-button onclick={closeDeleteProductModal} variant="neutral" label="Cancel">
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

@@ -1,0 +1,20 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId,lightning:actionOverride">
+
+	<aura:html tag="style">
+        .slds-modal__container{
+        	width: 90%;
+            max-width: 90%;
+            padding-top: 0rem;          
+        } 
+        .slds-modal__content {
+        	overflow-x: scroll;
+        }              
+    </aura:html>    
+    
+    <lightning:navigation aura:id="navService"/>
+
+    <c:orderProducts recordId="{!v.recordId}" onclose="{!c.goBack}"/>
+
+    
+    
+</aura:component>

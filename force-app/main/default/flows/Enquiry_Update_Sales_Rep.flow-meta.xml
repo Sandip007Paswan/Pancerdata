@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>50.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>check_SalesRep_Record</name>
+        <label>check SalesRep Record</label>
+        <locationX>529</locationX>
+        <locationY>298</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>is_SalesRep_Empty</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>get_SalesRep_Record</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Clear_Enquiry_OrderID</targetReference>
+            </connector>
+            <label>is SalesRep Empty?</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>check_User_SalesRep</name>
+        <label>check User SalesRep</label>
+        <locationX>166</locationX>
+        <locationY>298</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>is_UserSalesRep_Empty</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Owner.Sales_Rep_ID2__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>get_SalesRep_Record</targetReference>
+            </connector>
+            <label>is UserSalesRep Empty?</label>
+        </rules>
+    </decisions>
+    <interviewLabel>Enquiry - Update Sales Rep {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Enquiry - Update Sales Rep</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>get_SalesRep_Record</name>
+        <label>get SalesRep Record</label>
+        <locationX>379</locationX>
+        <locationY>296</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>check_SalesRep_Record</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>ID__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Owner.Sales_Rep_ID2__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Sales_Rep__c</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Branch__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Clear_Enquiry_OrderID</name>
+        <label>Clear Enquiry OrderID</label>
+        <locationX>708</locationX>
+        <locationY>293</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Sales_Rep_Branch__c</field>
+            <value>
+                <elementReference>get_SalesRep_Record.Branch__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Sales_Rep__c</field>
+            <value>
+                <elementReference>get_SalesRep_Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+    </recordUpdates>
+    <start>
+        <locationX>49</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>check_User_SalesRep</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

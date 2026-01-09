@@ -1,0 +1,41 @@
+<aura:component implements="force:appHostable,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:availableForFlowScreens" access="global" >
+    <aura:attribute name="comments" type="String" default="" />
+    <aura:attribute name="opportunity" type="Object"/>
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <lightning:flow aura:id="flowData" class="slds-hidden" onstatuschange ="{!c.handleStatusChange}"/>
+    <force:recordData aura:id="record"
+                      recordId="{!v.recordId}"                   
+                      targetError="{!v.recordError}"
+                      targetFields="{!v.opportunity}"
+                      fields="StageName,Pricing_Completed__c,Quotation_Accepted__c,Quotation_Approved__c,is_Revise_Pricing__c,Branch_Manager_Approval__c"
+                      mode="EDIT"/>
+    
+    <aura:html tag="style">
+        .slds-modal__container{
+        max-width: 900px !important;
+        width:100% !important;
+        }
+        
+    </aura:html>
+    
+    <header class="slds-modal__header">
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Action Confirmation: Revise Pricing</h2>
+    </header>
+    <div class="slds-modal__content slds-is-relative slds-p-around--medium" style="padding-top: 30px;padding-bottom: 50px;">
+        <p>This action will update the Enquiry stage to Pricing and reset any approval related fields. Click on the "Confirm" button to continue.</p>
+    </div>
+    <aura:if isTrue="{!v.spinner}">
+        <div class="demo-only">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <footer class="slds-modal__footer">
+        <button class="slds-button slds-button_neutral" onclick="{!c.Cancel}">Cancel</button>
+        <button class="slds-button slds-button_brand" onclick="{!c.Submit}">Confirm</button>
+    </footer>
+</aura:component>

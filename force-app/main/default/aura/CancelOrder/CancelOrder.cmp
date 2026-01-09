@@ -1,0 +1,41 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,lightning:actionOverride">
+    
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:html tag="style">
+        .slds-modal__container{
+        	max-width: 1000px;
+        	padding: 0rem;} 
+        .slds-modal__content {
+        	padding: 0;
+        }
+    </aura:html>
+    
+    <section role="dialog" tabindex="-1" class="slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+        <div class="">
+            
+            <header class="slds-modal__header">
+                <!--
+                <lightning:buttonIcon iconName="utility:close"
+                                      onclick="{! c.cancel }"
+                                      alternativeText="Close this window"
+                                      variant="bare-inverse"
+                                      class="slds-modal__close"/>   
+                -->
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Cancel Order</h2>
+            </header>
+            <div class="slds-p-around_medium slds-text-align_center" id="modal-content-id-1">
+                <p>You are about to cancel the order. Are you sure?</p>
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button variant="neutral" label="Cancel" title="Cancel" onclick="{! c.cancelOrder }"/>
+                <lightning:button variant="brand" label="Yes" title="Yes" onclick="{! c.submitOrder }"/>
+            </footer>
+        </div>
+    </section>
+    <!--<div class="slds-backdrop slds-backdrop_open"></div>-->
+    
+    <lightning:flow aura:id="Cancel_Order" onstatuschange="{!c.handleCancelOrder}" class="flowData"/>
+    
+</aura:component>

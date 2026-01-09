@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApprovalProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <allowRecall>true</allowRecall>
+    <allowedSubmitters>
+        <type>owner</type>
+    </allowedSubmitters>
+    <approvalPageFields>
+        <field>Name</field>
+        <field>Owner</field>
+        <field>Amount2__c</field>
+        <field>Min_Margin__c</field>
+    </approvalPageFields>
+    <approvalStep>
+        <allowDelegate>false</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <name>Sales_Coordinator__c</name>
+                <type>relatedUserField</type>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <label>Submit to Sales Coordinator</label>
+        <name>Submit_To_Sales_Coordinator</name>
+    </approvalStep>
+    <description>This approval process brings the Sales Coordinator to review before pushing it to Oracle. Once approved, a Contract record is created. If the Enquiry Owner&apos;s profile is a Sales Co, then Sales Co will be exempted from this Review process.</description>
+    <enableMobileDeviceAccess>false</enableMobileDeviceAccess>
+    <entryCriteria>
+        <formula>AND
+(
+RecordType.DeveloperName=&apos;ContractOpportunity&apos;,
+TEXT(StageName)=&apos;Quotation&apos;,
+NOT(ISBLANK(TEXT(Close_Reason__c))),
+Quotation_Accepted__c = TRUE,
+Owner.Profile.Name &lt;&gt; &apos;Pansar Branch Management&apos;
+)</formula>
+    </entryCriteria>
+    <finalApprovalActions>
+        <action>
+            <name>Closed_Won</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>Contract_Sales_Co_Reviewed</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalApprovalActions>
+    <finalApprovalRecordLock>false</finalApprovalRecordLock>
+    <finalRejectionActions>
+        <action>
+            <name>Sales_Co_Rejected</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalRejectionActions>
+    <finalRejectionRecordLock>false</finalRejectionRecordLock>
+    <initialSubmissionActions>
+        <action>
+            <name>Stage_Submit</name>
+            <type>FieldUpdate</type>
+        </action>
+    </initialSubmissionActions>
+    <label>Review (Contract)</label>
+    <nextAutomatedApprover>
+        <useApproverFieldOfRecordOwner>false</useApproverFieldOfRecordOwner>
+        <userHierarchyField>Sales_Coordinator__c</userHierarchyField>
+    </nextAutomatedApprover>
+    <processOrder>6</processOrder>
+    <recallActions>
+        <action>
+            <name>Quotation</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>Quotation_Accepted_Unchecked</name>
+            <type>FieldUpdate</type>
+        </action>
+    </recallActions>
+    <recordEditability>AdminOrCurrentApprover</recordEditability>
+    <showApprovalHistory>true</showApprovalHistory>
+</ApprovalProcess>

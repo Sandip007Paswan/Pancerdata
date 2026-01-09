@@ -1,0 +1,130 @@
+<aura:component>    
+    
+    <aura:attribute name="order" type="object" description="to store single activity (task/event) record data"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <li>
+        <div class="isExpendable slds-timeline__item_expandable slds-timeline__item_order slds-is-open" aura:id="expId"> 
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon"
+                            onclick="{!c.toggleAcitivity}"
+                            title="test"
+                            aria-controls="task-item-base">
+                        <lightning:icon iconName="utility:switch" 
+                                        size="x-small"
+                                        class="slds-button__icon slds-timeline__details-action-icon"/>
+                    </button>
+                    
+                    <div class="slds-icon_container" title="task">
+                        <lightning:icon iconName="standard:orders" size="small"/>
+                    </div>
+                </div>
+                
+                <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                            <h3 class="slds-truncate" title="CreatedDate">
+                                <lightning:formattedDateTime value="{!v.order.CreatedDate}" />
+                                 - <strong><a onclick="{!c.linkToRecord}" target="_blank">{!v.order.OrderNumber}</a></strong>
+                            </h3>
+                        </div>
+                        <div class="slds-timeline__actions_inline">
+                            <p class="slds-timeline__date">{!v.order.Account.Name}</p>                              
+                        </div>
+                    </div>
+                    
+                  <!-- <lightning:layout pullToBoundary="medium">
+                        <lightning:layoutItem flexibility="auto" padding="horizontal-medium">
+                            <h3 class="" title="CreatedDate">
+                                <lightning:formattedDateTime value="{!v.order.CreatedDate}" />
+                                 - <strong><a onclick="{!c.linkToRecord}" target="_blank">{!v.order.OrderNumber}</a></strong>
+                            </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" padding="horizontal-medium">
+                            <p class="slds-timeline__date">{!v.order.Account.Name}</p> 
+                        </lightning:layoutItem>
+                    </lightning:layout>-->
+
+                    
+                    <!-- expandable section start-->
+                    <article class="slds-card slds-box slds-timeline__item_details slds-theme_shade slds-m-horizontal_xx-small"
+                             id="order-item-base"
+                             aria-hidden="true">
+                        
+                        <div aura:id="orderProductsForm">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                                <thead>
+                                    <tr class="slds-text-title--caps">
+                                        <th class="" scope="col" style="width:35%">
+                                            <div class="slds-truncate" title="Product Name">Name</div>
+                                        </th>
+                                        <th class="" scope="col" style="width:15%">
+                                            <div class="slds-truncate" title="Product Code">Prod. Code</div>
+                                        </th>
+                                        <th class="" scope="col" style="width:10%">
+                                            <div class="slds-truncate" title="Quantity">Qty</div>
+                                        </th>
+                                        <th class="" scope="col" style="width:20%">
+                                            <div class="slds-truncate" title="List Price">List Price</div>
+                                        </th> 
+                                        <th class="" scope="col" style="width:20%">
+                                            <div class="slds-truncate" title="Sales Price">Sales Price</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody> 
+                                    <aura:iteration items="{!v.order.OrderItems}" var="item" indexVar="index">
+                                        <tr>
+                                            <td data-label="Name">
+                                                <div class="slds-truncate" title="{!item.Product2.Name}">{!item.Product2.Name}</div>               
+                                            </td>
+                                            <td data-label="ProductCode">
+                                                <div class="slds-truncate" title="{!item.Product2.ProductCode}">{!item.Product2.ProductCode}</div>               
+                                            </td>
+                                            <td data-label="Quantity">
+                                                <div class="slds-truncate" title="{!item.Quantity}">{!item.Quantity}</div>               
+                                            </td>
+                                            <td data-label="List Price">
+                                                <div class="slds-truncate" title="{!item.ListPrice}">
+                                                    <lightning:formattedNumber value="{!item.ListPrice}" style="currency" currencyCode="MYR" currencyDisplayAs="code"/>
+                                                </div>               
+                                            </td>
+                                            <td data-label="Unit Price">
+                                                <div class="slds-truncate" title="{!item.UnitPrice}">
+                                                    <lightning:formattedNumber value="{!item.UnitPrice}" style="currency" currencyCode="MYR" currencyDisplayAs="code"/>
+                                                </div>               
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                            
+                        
+                        
+                        
+                        
+                        <!--<ul class="slds-list_horizontal slds-wrap">
+                            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+                                <span class="slds-text-title slds-p-bottom_x-small">Priority</span>
+                                <span class="slds-text-body_medium slds-truncate" title="{!v.orderItem.Priority}">{!v.orderItem.Priority}</span>
+                            </li>
+                            
+                            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+                                <span class="slds-text-title slds-p-bottom_x-small">Description</span>
+                                <span class="slds-text-body_medium slds-truncate" title="{!v.orderItem.Description}">{!v.orderItem.Description}</span>
+                            </li>
+                            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+                                <span class="slds-text-title slds-p-bottom_x-small">Related To</span>
+                                <span class="slds-text-body_medium slds-truncate" title="{!v.orderItem.Who.Name}">{!v.orderItem.Who.Name}</span>
+                            </li>
+                        </ul>-->
+                    </article>
+                    
+                </div>
+            </div>
+        </div>
+    </li>
+</aura:component>

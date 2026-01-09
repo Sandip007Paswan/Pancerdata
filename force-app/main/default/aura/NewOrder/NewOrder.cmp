@@ -1,0 +1,225 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId,lightning:actionOverride">
+    
+    <aura:attribute name="contractLineItems" type="Contract_Line_Item__c[]" />
+    <aura:attribute name="newContractLineItems" type="Contract_Line_Item__c[]" />
+    <aura:attribute name="isValid" type="Boolean" default="false" />
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    <aura:attribute name="currentNewProductIndex" type="Integer" default="null" />
+    <aura:attribute name="newProductsQueue" type="Integer" default="null" />
+    <aura:attribute name="newProductsQueueIndex" type="Integer" default="null" />
+    <aura:attribute name="createProductsOnly" type="Boolean" default="false" />
+    <aura:attribute name="fullPageMode" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <lightning:navigation aura:id="navService"/>
+    
+    <aura:if isTrue="{!v.spinner}">
+    	<lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+
+	<aura:html tag="style">
+        .slds-modal__container{
+        	width: 90%;
+            max-width: 90%;
+            padding-top: 0rem;          
+        } 
+        .slds-modal__content {
+        	overflow-x: scroll;
+        }              
+    </aura:html>    
+    
+    <div class="container">
+    <lightning:input aura:id="searchProduct" name="searchProduct" label="Search Product" onchange="{!c.searchProductChanged}" class="searchProduct"/>
+    
+    <br/>
+    
+        <div style="min-width:1200px">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="" scope="col" style="width:30%">
+                            <div class="slds-truncate" title="Product">Product</div>
+                        </th>
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="Code">Code</div>
+                        </th>
+                        <!--<th class="" scope="col" style="width:23%">
+                            <div class="slds-truncate" title="Description">Description</div>
+                        </th>-->
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="Sales Price">Sales Price</div>
+                        </th>
+                        <!--
+                        <th class="slds-text-align_center" scope="col">
+                            <div class="slds-truncate" title="Discount">Discount</div>
+                        </th>                 
+                        -->
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="Total Quantity">Total Quantity</div>
+                        </th> 
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="Total Ordered">Total Ordered</div>
+                        </th>  
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="Total Remaining">Total Remaining</div>
+                        </th>  
+                        <th class="slds-text-align_center" scope="col" style="width:10%">
+                            <div class="slds-truncate" title="New Order">New Order</div>
+                        </th> 
+                        <!--
+                <th class="slds-text-align_center" scope="col">
+                 <div class="slds-truncate" title="New Total">New Total</div>
+                </th>
+    -->               
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.contractLineItems}" var="item">
+                        <tr class="{!'slds-hint-parent contractLineItems contractLineItem_' + item.Product__c}">                
+                            <th data-label="Product Name" scope="row">
+                                <div class="slds-truncate" title="{!item.Product_Name__c}">
+                                    <a href="{!'/' + item.Product__c}" tabindex="-1" target="_blank">{!item.Product_Name__c}</a>
+                                </div>
+                            </th>
+                            <td data-label="Product Code" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Product_Code__c}">{!item.Product_Code__c}</div>
+                            </td>  
+                            <!--<td data-label="Product Description">
+                                <lightning:input type="text" aura:id="contractLineItemDescription" name="productDescription" value="" 
+                                                 variant="label-hidden"
+                                                 onchange="" required="false" placeholder="{!item.Product_Description__c}"/>                     
+                            </td>-->
+                            <td data-label="Sales Price" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Sales_Price__c}">
+                                    <lightning:formattedNumber value="{!item.Sales_Price__c}" style="currency" currencyCode="MYR" currencyDisplayAs="symbol"/>
+                                </div>
+                            </td> 
+                            <!--
+                            <td data-label="Sales Price" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Populated_Discount__c}">
+                                    <lightning:input type="number" aura:id="discount" name="discount" value="{!item.Populated_Discount__c}" 
+                                                     variant="label-hidden" min="0" max="100" 
+                                                     onchange="" required="true"/>  
+                                </div>
+                            </td>    
+                            -->            
+                            <td data-label="Total Quantity" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Total_Quantity__c}">{!item.Total_Quantity__c}</div>
+                            </td>      
+                            <td data-label="Total Ordered" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Total_Ordered__c}">{!item.Total_Ordered__c}</div>
+                            </td>      
+                            <td data-label="Total Remaining" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Total_Remaining__c}">{!item.Total_Remaining__c}</div>
+                            </td> 
+                            <td data-label="New Order" class="slds-text-align_center">
+                                <lightning:input type="number" aura:id="totalRemaining" name="totalRemaining" value="0" step="0.0001" 
+                                                 variant="label-hidden" min="0" max="{!item.Total_Remaining__c}" 
+                                                 onchange="" required="true"/>
+                            </td>
+                            <!--
+    <td data-label="New Total" class="slds-text-align_center">
+                    <div class="slds-truncate" title="{!item.New_Total__c}">{!item.New_Total__c}</div>
+                </td>
+    -->                
+                        </tr>
+                    </aura:iteration>  
+                    <aura:iteration items="{!v.newContractLineItems}" var="item" indexVar="index">
+                        <tr>
+                            <td>
+                                <lightning:recordEditForm aura:id="recordEditForm"
+                                                          objectApiName="Contract_Line_Item__c"
+                                                          onsuccess="{!c.handleSuccessCreateContractLineItem}"
+                                                          onerror="{!c.handleErrorCreateContractLineItem}"> 
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="Contract__c" variant="label-hidden" required="false" value="{!item.Contract__c}"/>
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="Product_Description__c" variant="label-hidden" required="false" value="{!item.Product_Description__c}"/>
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="Total_Quantity__c" variant="label-hidden" required="true" value="{!item.Total_Quantity__c}"/>                        
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="Sales_Price__c" variant="label-hidden" required="true" value="{!item.Sales_Price__c}"/>
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="Discount__c" variant="label-hidden" required="false" value="{!item.Discount__c}"/>
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="New_Order_Quantity__c" variant="label-hidden" required="false" value="{!item.New_Order_Quantity__c}"/>
+                                    <lightning:inputField aura:id="newContractLineItemHiddenFields" class="slds-hide" fieldName="PriceBookEntry_Id__c" variant="label-hidden" required="false" value="{!item.PriceBookEntry_Id__c}"/>
+                                    
+                                    <div class="slds-grid">
+                                        <div class="slds-col">
+                                            <lightning:icon iconName="action:close" size="xx-small" alternativeText="Remove" title="Remove" style="cursor:pointer" onclick="{!c.removeProduct}" class="{!index}"/>                    	
+                                        </div>
+                                        <div class="slds-col">
+                                            <lightning:inputField aura:id="newContractLineItemFields" class="{!index}" fieldName="Product__c" variant="label-hidden" required="true" messageWhenValueMissing="Enter Product" value="{!item.Product__c}" onchange="{!c.productChanged}"/>
+                                            <lightning:inputField aura:id="newContractLineItemDescription" class="slds-hide" fieldName="Product_Description__c" variant="label-hidden" required="false" value="{!item.Product_Description__c}"/>
+                                        </div>
+                                    </div>
+                                </lightning:recordEditForm>
+                            </td>
+                            <td data-label="Product Code">
+                                <div class="slds-truncate" title="{!item.Product_Code__c}">{!item.Product_Code__c}</div>
+                            </td>  
+                            <td data-label="Product Description">
+                                <div class="slds-truncate" title="{!item.Product_Description__c}">
+                                    <lightning:input type="text" aura:id="newContractLineItemFields" name="productDescription" value="{!item.Product_Description__c}" 
+                                                     variant="label-hidden"
+                                                     onchange="" required="false"/>                     
+                                </div>
+                            </td>
+                            <td data-label="Sales Price" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Sales_Price__c}">
+                                    <lightning:input type="number" aura:id="newContractLineItemFields" name="salesPrice" value="{!item.Sales_Price__c}" 
+                                                     variant="label-hidden"
+                                                     onchange="" required="true"/>  
+                                </div>
+                            </td>
+                            <!--
+                            <td data-label="Discount" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Discount__c}">
+                                    <lightning:input type="number" aura:id="newContractLineItemFields" name="discount" value="{!item.Discount__c}" 
+                                                     variant="label-hidden" min="0" max="100" 
+                                                     onchange="" required="false"/>   
+                                </div>
+                            </td>
+                            -->                 
+                            <td data-label="Total Quantity" class="slds-text-align_center">
+                                <lightning:input type="number" aura:id="newContractLineItemFields" name="totalQuantity" value="{!item.Total_Quantity__c}" 
+                                                 variant="label-hidden" 
+                                                 onchange="" required="true"/>                
+                            </td>      
+                            <td data-label="Total Ordered" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Total_Ordered__c}">0</div>
+                            </td>      
+                            <td data-label="Total Remaining" class="slds-text-align_center">
+                                <div class="slds-truncate" title="{!item.Total_Remaining__c}">0</div>
+                            </td> 
+                            <td data-label="New Order" class="slds-text-align_center">
+                                <lightning:input type="number" aura:id="newContractLineItemFields" name="newOrderQuantity" value="{!item.New_Order_Quantity__c}"
+                                                 variant="label-hidden" min="0" max="{!item.Total_Quantity__c}" step="0.0001"
+                                                 onchange="" required="true"/>
+                            </td>                    
+                        </tr>
+                    </aura:iteration>
+                    <!--<tr>
+                        <td colspan="8">
+                            <div class="slds-text-align_left">
+                                <lightning:button variant="brand" label="Add Product" title="Add Product" onclick="{! c.addProduct }"/>
+                            </div>
+                        </td>
+                    </tr>-->       
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="slds-text-align_center slds-m-top_small">
+            <!--<lightning:button variant="brand" label="Save Added Product(s)" title="Save Added Product(s)" onclick="{! c.createProducts }" disabled="{!empty(v.newContractLineItems)}"/>-->
+            <lightning:button variant="brand" label="Create Order" title="Create Order" onclick="{! c.createOrder }" disabled="{!empty(v.contractLineItems)}"/>
+            <aura:if isTrue="{!v.fullPageMode}">
+            <div class="slds-text-align_right slds-float_right">
+                <lightning:button variant="brand" label="Back" title="Back" onclick="{! c.goBack }"/>
+            </div>
+            </aura:if>
+        </div>
+	
+    </div>    
+
+    <lightning:flow aura:id="Query_Contract_Products" onstatuschange="{!c.handleQueryContractProducts}" class="flowData"/>	
+    <lightning:flow aura:id="Create_Order" onstatuschange="{!c.handleCreateOrder}" class="flowData"/>	
+    <lightning:flow aura:id="Query_Product" onstatuschange="{!c.handleQueryProduct}" class="flowData"/>	
+    
+</aura:component>

@@ -1,0 +1,14 @@
+.THIS.flowData 
+{
+    visibility: hidden;
+}
+.THIS.container
+{
+    background-color: #ffffff;
+    padding: 10px;  
+}
+.THIS .searchProduct
+{
+    font-weight: bold;
+    font-size: 13px;    
+}

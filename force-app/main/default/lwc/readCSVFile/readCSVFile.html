@@ -1,0 +1,24 @@
+<template>
+    <lightning-card icon-name="doctype:excel" title='Read CSV File and Insert Products'>
+        <div style="margin-left: 3%">
+            <lightning-file-upload accept={acceptedFormats} 
+                                   label="Upload Spart Parts" 
+                                   multiple="multiple" 
+                                   onuploadfinished={handleUploadFinished} 
+                                   record-id={recordId}></lightning-file-upload>
+        </div>
+
+        <br/>
+        <div if:true={error} style="color: red;">
+            Error Message : {error}
+        </div><br/>
+
+        <div if:true={data}>
+            <lightning-datatable columns={columns} 
+                                 data={data} 
+                                 hide-checkbox-column="true" 
+                                 key-field="id"></lightning-datatable>
+        </div>
+
+    </lightning-card>
+</template>

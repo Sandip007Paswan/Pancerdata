@@ -1,0 +1,41 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" controller="OrderController">
+
+    <!--<aura:handler name="init" value="{!this}" action="{!c.doInit}" />-->
+
+    <aura:attribute name="showSpinner" type="Boolean" default="true"/>
+    <aura:attribute name="isItemsEmpty" type="Boolean" default="true"/>
+    <aura:attribute name="orderTimelines" type="list"/>
+    <aura:attribute name="simpleRecord" type="Object" />
+    <aura:attribute name="record" type="Object" />
+    
+    <force:recordData aura:id="recordEditor"
+                      fields="AccountId"
+                      recordId="{!v.recordId}"
+                      targetFields ="{!v.simpleRecord}"
+                      recordUpdated="{!c.doInit}"
+                      mode="VIEW" />
+
+        <!--<div class="slds-text-heading_medium" style="margin-bottom:20px;"> Past Order - Pricing Details </div>-->
+    <aura:if isTrue="{!v.isItemsEmpty == false}">
+        <ul class="slds-timeline">
+            
+            <aura:iteration items="{!v.orderTimelines}" var="item">
+                
+                <c:OrderTimeline order="{!item}"/>
+                
+            </aura:iteration>
+        </ul>
+        <div class="slds-text-align_center">
+            <a onclick="{!c.linkToRelatedAccount}" target="_blank" >View More</a>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isItemsEmpty == True}">   
+        No Order or pricing history information is available for this Account. 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+    
+</aura:component>
