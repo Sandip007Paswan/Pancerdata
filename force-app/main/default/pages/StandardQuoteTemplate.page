@@ -1,0 +1,400 @@
+<apex:page standardController="Quote" extensions="QuoteTemplateController" renderAs="pdf" showQuickActionVfHeader="false" showHeader="false" applyBodyTag="false" cache="false">
+<head>
+<style>
+@page {
+<!--width: 1200px;-->
+    margin-top: 140px;
+    margin-bottom: 50px;
+    margin-left: 50px;
+    margin-right: 50px;
+    size: A4 portrait;
+@bottom-left {
+    content: element(footer);
+}
+@top-left {
+    content: element(header);
+}
+}
+body {
+<!--font-family: sans-serif;-->
+    font-family: Arial Unicode MS;
+    font-size: 11px;
+}
+
+td, th {vertical-align:top;}
+
+#products {
+    font-family: Arial Unicode MS;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#products td, #products th {
+    border: 1px solid #ddd;
+    padding: 5px;
+    max-width: 300px;
+}
+
+#products th {
+    font-weight: bold !important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    font-family: sans-serif;
+}
+.header {
+position: running(header);
+background-repeat: no-repeat;
+<!--width: 828px;-->
+    height: 100px;
+    padding-bottom: 70px;
+    padding-left: 10px;
+}
+.footer {
+    position: running(footer);
+    position: fixed;
+    background-repeat: no-repeat;
+    right: 0;
+    bottom: 0px;
+}
+.label {
+<!--font-weight: bold;-->
+    padding: 1px;
+    width: 260px;
+    align: left;
+}
+.valuecol1{
+    width: 1200px;
+}
+.valuecol2{
+    width: 800px;
+}
+
+tr, table{
+    width: 100%;
+    border-spacing: 0px !important;
+}
+
+
+.pagenumber:before {
+content: counter(page);
+}
+
+.pagecount:before {
+content: counter(pages);
+}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+    <!--https://pansar--dev--c.visualforce.com/apex/StandardQuoteTemplate?id=0Q01s0000004vuWCAQ-->
+
+    <table >
+        <tr>
+            <td style="width:460px"><img style="padding-top: 10px;" align="left" src='{!$Resource.Pansar_Logo}'/></td>
+            <td style="width:400px; padding-top: 30px;"><span style="font-family:sans-serif;color:#302D2D:font-weight: bold !important;"><b>Pansar Company Sdn Bhd 196501000061 (50977M)</b></span><br/></td>
+        </tr>
+        <tr>
+            <td style="width:460px"><apex:outputText style="white-space:pre-wrap;" escape="false" value="{!Quote.Opportunity.Branch_Address_Info__c}"></apex:outputText></td>
+            <td style="width:400px"><apex:outputText style="white-space:pre-wrap;" escape="false" value="{!Quote.Opportunity.Additional_Branch_Info__c}"></apex:outputText></td>
+        </tr>
+    </table>
+
+</div>
+
+<div class="page">
+<table>
+    <tbody>
+        <tr>
+            <td colspan="3" class="label" style="font-family:sans-serif;font-weight: bold !important;"><b>TO</b></td>
+            <td colspan="3" class="label" style="font-family:sans-serif;font-weight: bold !important;"><b>QUOTATION</b></td>
+        </tr>
+        <tr>
+            <td class="label">Account Name</td><td class="label" style="width:5px">:</td><td class="valuecol2">{!Quote.Account.Name}</td>
+            <td class="label">Created Date</td><td class="label" style="width:5px">:</td><td class="valuecol2"><apex:outputText value="{0, date, dd/MM/yyyy}"><apex:param value="{!Quote.CreatedDate}" /></apex:outputText></td>
+        </tr>
+        <tr>
+            <td class="label">Account Number</td><td class="label" style="width:5px">:</td><td class="valuecol2">{!Quote.Account.AccountNumber}</td>
+            <td class="label">Ref No.</td><td class="label" style="width:5px">:</td><td class="valuecol2">{!Quote.Ref_No__c}</td>
+        </tr>
+        <tr>
+            <td class="label">Bill To</td><td class="label" style="width:5px">:</td>
+            <td rowspan="2" valign="top" class="valuecol2">{!Quote.BillingStreet}<br/>{!Quote.BillingCity} {!Quote.BillingState} {!Quote.BillingPostalCode}<br/>{!Quote.BillingCountry}</td>
+            <td class="label">Version Number</td><td class="label" style="width:5px">:</td><td class="valuecol2">{!Quote.Quote_Version__c }</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="label"> </td>
+            <td class="label">Sales Person</td><td class="label" style="width:5px">:</td><td class="valuecol2">{!Quote.Opportunity.Sales_Rep__r.Name}</td>
+        </tr>
+        <tr>
+            <td align="left" style="padding-top:5px" class="label">Customer Ref No</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1" >{!Quote.Customer_Ref_No__c}</td>
+        </tr>
+        <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order'}">
+        <tr>
+            <td align="left" class="label">Vessel Name</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Opportunity.Vessel_Name__c}</td>
+        </tr>
+        </apex:outputText>
+        <apex:outputText rendered="{!Quote.ContactId != null}">
+        <tr>
+            <td align="left" class="label">Name</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Contact.Name}</td>
+        </tr>
+        <tr>
+            <td align="left" class="label">Mobile</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Contact.Phone}</td>
+        </tr>
+        <tr>
+            <td align="left" class="label">Fax</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Contact.Fax}</td>
+        </tr>
+        </apex:outputText>
+        <apex:outputText rendered="{!Quote.ContactId == null}">
+        <tr>
+            <td align="left" class="label">Name</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Contact_Name__c}</td>
+        </tr>
+        <tr>
+            <td align="left" class="label">Mobile</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Phone}</td>
+        </tr>
+        <tr>
+            <td align="left" class="label">Fax</td><td class="label" style="width:5px">:</td><td colspan="4" class="valuecol1">{!Quote.Fax}</td>
+        </tr>
+        </apex:outputText>
+    </tbody>
+</table>
+<br/>
+<br/>
+<tr>
+    <td style="width:240px;font-family:sans-serif;color:#302D2D:font-weight: bold !important;" align="left" class="label"><b>PRICE ENQUIRY:-</b></td>
+</tr>
+<tr>
+    <td style="width:240px;" align="left" class="label">{!Quote.Opportunity.Name}</td>
+</tr>
+<br/>
+    <div>
+        <span>We thank you for your enquiry and are pleased to offer our quotation below for your consideration:</span>
+    </div>
+</div>
+<br/>
+
+<table style="-fs-table-paginate: paginate !important;">
+    <tr><td>
+    <table id="products" style="width:100%;padding-bottom:10px; -fs-table-paginate: paginate !important;">
+        <thead>
+            <tr>
+                <th><b>No.</b></th>
+                <th align="left">Description</th>
+                <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order'}">
+                    <th>Parts Name (S/S)</th>
+                    <th>Parts No (SS)</th>
+                    <th>Sold in Packs</th>
+                    <th>Delivery </th>
+                </apex:outputText>
+                <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName != 'Spare_Parts_Order'}">
+                    <th>UOM</th>
+                </apex:outputText>
+                <th>Quantity</th>
+                <th>Unit Price (RM)</th>
+                <th>Total Price (RM)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <apex:variable var="count" value="{!0}"/>
+            <apex:variable var="rowNum" value="{!0}"/>
+            <apex:repeat value="{!products}" var="p">
+                <apex:variable var="rowNum" value="{!rowNum + 1}"/>
+                <tr style="width:100%;page-break-inside:avoid;">
+                    <apex:outputText rendered="{!(Quote.Opportunity.RecordType.DeveloperName != 'Customised_Engineering_Solution')
+                                               && (Quote.Opportunity.RecordType.DeveloperName != 'Spare_Parts_Order')}">
+                        <td align="center">{!p.Item_No__c}</td>
+                        <td style="">{!p.Product2.ProductCode} {!p.Product2.Name} <!--white-space:pre-wrap;-->
+                            <div style="font-size: 10px; color: #555555;">
+                                <apex:outputText rendered="{!p.Additional_Description_Line_1__c != null}">
+                                    <div>{!p.Additional_Description_Line_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_2__c != null}">
+                                    <div>{!p.Additional_Description_Line_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_3__c != null}">
+                                    <div>{!p.Additional_Description_Line_3__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_4__c != null}">
+                                    <div>{!p.Additional_Description_Line_4__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_1__c != null}">
+                                    <div>{!p.Additional_Description_Para_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_2__c != null}">
+                                    <div>{!p.Additional_Description_Para_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_3__c != null}">
+                                    <div>{!p.Additional_Description_Para_3__c}</div>
+                                </apex:outputText>
+                            </div>
+                        </td>
+                        <td align="center">{!p.UOM__c}</td>
+                    </apex:outputText>
+
+                    <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order'}">
+                        <td align="center">{!p.Item_No__c}</td>
+                        <td style="">{!p.Description_Quote__c}
+                            <div style="font-size: 10px; color: #555555;">
+                                <apex:outputText rendered="{!p.Additional_Description_Line_1__c != null}">
+                                    <div >{!p.Additional_Description_Line_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_2__c != null}">
+                                    <div>{!p.Additional_Description_Line_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_3__c != null}">
+                                    <div>{!p.Additional_Description_Line_3__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_4__c != null}">
+                                    <div>{!p.Additional_Description_Line_4__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_1__c != null}">
+                                    <div>{!p.Additional_Description_Para_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_2__c != null}">
+                                    <div>{!p.Additional_Description_Para_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_3__c != null}">
+                                    <div>{!p.Additional_Description_Para_3__c}</div>
+                                </apex:outputText>
+                            </div>
+                        </td>
+                        <td align="left">{!p.Parts_Name_S_S__c}</td>
+                        <td align="center">{!p.Parts_No_S_S__c}</td>
+                        <apex:outputText rendered="{!p.Sold_in_Packs__c == true}"><td align="center">&#10004;</td></apex:outputText>
+                        <apex:outputText rendered="{!p.Sold_in_Packs__c == false}"><td align="center">&times;</td></apex:outputText>
+                        <td align="left">{!p.Delivery__c}</td>
+                    </apex:outputText>
+
+                    <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Customised_Engineering_Solution'}">
+                        <td align="center">{!rowNum}</td>
+                        <td style="">{!p.Description_Quote_MI__c}
+                            <div style="font-size: 10px; color: #555555;">
+                                <apex:outputText rendered="{!p.Additional_Description_Line_1__c != null}">
+                                    <div >{!p.Additional_Description_Line_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_2__c != null}">
+                                    <div>{!p.Additional_Description_Line_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_3__c != null}">
+                                    <div>{!p.Additional_Description_Line_3__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Line_4__c != null}">
+                                    <div>{!p.Additional_Description_Line_4__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_1__c != null}">
+                                    <div>{!p.Additional_Description_Para_1__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_2__c != null}">
+                                    <div>{!p.Additional_Description_Para_2__c}</div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!p.Additional_Description_Para_3__c != null}">
+                                    <div>{!p.Additional_Description_Para_3__c}</div>
+                                </apex:outputText>
+                            </div>
+                        </td>
+                        <td align="center">{!p.UOM_M_I__c}</td>
+                    </apex:outputText>
+
+                    <td align="right">{!p.Quantity_Formula__c}</td>
+                    <!--<apex:outputText value="{0,Number,###,###,###,##0.0000}"><apex:param value="{!p.Quantity_Formula__c}"/></apex:outputText></td>-->
+
+                    <td align="right"><apex:outputText value="{0,Number,###,###,###,##0.00}"><apex:param value="{!p.UnitPrice}"/></apex:outputText></td>
+                    <apex:outputText rendered="{!(Quote.Opportunity.RecordType.DeveloperName != 'Customised_Engineering_Solution') && (Quote.Opportunity.RecordType.DeveloperName != 'Spare_Parts_Order')}">
+                        <td align="right"><apex:outputText value="{0,Number,###,###,###,##0.00}"><apex:param value="{!p.Total_Price2__c}"/></apex:outputText></td>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!(Quote.Opportunity.RecordType.DeveloperName == 'Customised_Engineering_Solution') || (Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order')}">
+                        <td align="right"><apex:outputText value="{0,Number,###,###,###,##0.00}"><apex:param value="{!p.TotalPrice}"/></apex:outputText></td>
+                    </apex:outputText>
+                </tr>
+            </apex:repeat>
+
+            <tr style="width:100%; page-break-inside:avoid;">
+                <td style="border-right-style: hidden;">E &amp; O.E.</td>
+                <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order'}">
+                    <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                    <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                    <td style="border-left-style: hidden; border-right-style: hidden;"></td>
+                </apex:outputText>
+                <td align="right" style="border-left-style: hidden;font-family:sans-serif;font-weight: bold !important;">TOTAL</td>
+                <apex:outputText rendered="{!(Quote.Opportunity.RecordType.DeveloperName != 'Customised_Engineering_Solution') && (Quote.Opportunity.RecordType.DeveloperName != 'Spare_Parts_Order')}">
+                    <td align="right"><apex:outputText value="{0,Number,###,###,###,##0.00}"><apex:param value="{!Quote.TOTAL__c}"/></apex:outputText></td>
+                </apex:outputText>
+                <apex:outputText rendered="{!(Quote.Opportunity.RecordType.DeveloperName == 'Customised_Engineering_Solution') || (Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order')}">
+                    <td align="right"><apex:outputText value="{0,Number,###,###,###,##0.00}"><apex:param value="{!Quote.TotalPrice}"/></apex:outputText></td>
+                </apex:outputText>
+            </tr>
+        </tbody>
+    </table>
+</td></tr>
+<!--<tr style="page-break-inside:avoid;"><td>-->
+<tr><td>
+<apex:form >
+<apex:outputPanel rendered="true" >
+<div style="display:block;padding-top:30px;">
+    <table>
+        <tbody>
+            <apex:outputText rendered="{!Quote.Opportunity.RecordType.DeveloperName == 'Spare_Parts_Order'}">
+                <tr>
+                    <td style="width:160px">S/S</td><td style="width:5px">:</td><td>{!Quote.Opportunity.S_S__c}</td>
+                </tr>
+            </apex:outputText>
+            <tr>
+                <td style="width:160px">Price Validity</td><td style="width:5px">:</td><td>{!Quote.Opportunity.Price_Validity__c}</td>
+            </tr>
+            <tr>
+                <td style="width:160px">Delivery</td><td style="width:5px">:</td><td class="valuecol1">{!Quote.Opportunity.Delivery_Formula__c}</td>
+            </tr>
+            <tr>
+                <td style="width:160px">Payment Method</td><td style="width:5px">:</td><td class="valuecol1">{!Quote.Opportunity.Payment_Method_Formula__c}</td>
+            </tr>
+            <tr>
+                <td style="width:160px">Warranty Period</td><td style="width:5px">:</td><td class="valuecol1">{!Quote.Opportunity.Warranty_Period_Formula__c}</td>
+            </tr>
+            <tr>
+                <td style="width:160px" valign="top">Remarks</td><td style="width:5px">:</td><td class="valuecol1"><apex:outputField value="{!Quote.Description}"/></td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <br/>
+
+    <table>
+        <tbody>
+            <tr style="page-break-inside:avoid;">
+                <td valign="top" align="left" style="font-family:sans-serif;width:450px;">
+                    <b>Branch Manager Contact</b><br/>{!Quote.Opportunity.Branch_Manager__r.Name}<br/>{!Quote.Opportunity.Branch_Manager_Contact__c}<br/><br/>
+                    <b>Sales Person Contact</b><br/>{!Quote.Opportunity.Sales_Person_Mobile_No__c}
+                    <br/><br/>This is a computer generated document<br/>
+                    and does not require a signature.
+                </td>
+                <td align="left" style="width:530px;font-family:sans-serif;">
+            <table width="100%" cellpadding="5" cellspacing="0" border="1">
+                    <tr><td>
+            <b>CONFIRMATION OF ORDER</b><br/>
+                    <i>Cancellation of order will not be accepted without prior consent. Such cancellation may incur cancellation fees and may result in the forfeiture of any deposits previously made.</i>
+            </td></tr>
+                    <tr><td><b>We accept the above quotation and confirm our order, </b><br/><br/><br/><br/><br/><br/>
+                    _________________________________________<br/>Company Chop/Name &amp; Signature
+            <br/><br/>Date :
+            </td></tr>
+            </table>
+        </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</apex:outputPanel>
+</apex:form>
+</td></tr>
+</table>
+
+<div class="footer">
+    <div >Page <span class="pagenumber"/> of <span class="pagecount"/></div>
+</div>
+</body>
+</apex:page>
